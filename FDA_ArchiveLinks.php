@@ -28,6 +28,10 @@ function tabledata($row)
 	$company = 0;
 	$i=0;
 	foreach($row->find('td') as $row) {
+		$row = rtrim($row, '</td>');
+		$row = ltrim($row, '<td>');
+		//good morning, this is where i left off
+		//$row = str_replace('&nbsp;', '', $row);
 		if ($i==0){
 			echo 'date:';
 			preg_match("/([0-9]{2})\/([0-9]{2})\/([0-9]{4})/", $row, $datematch);
@@ -39,6 +43,7 @@ function tabledata($row)
 
 		}
 		if ($i==1){
+			
 			echo 'brand name/article link: ';
 			//echo $row.'<br>';
 			preg_match('~calls/(.*?)">~',$row,$linkmatch);
@@ -46,12 +51,14 @@ function tabledata($row)
 			
 			preg_match('~htm">(.*?)</a>~', $row, $titlematch);
 			echo $titlematch[1].'<br>';
+			//$row = str_replace('</a> &nbsp;', '', $row);
 
 		}
 		if ($i==2){
 			echo 'Product Description: ';
 			echo $row.'<br>';
-			$descr = $row;
+			$descr = str_replace('</a> &nbsp;', '', $row);
+			//$descr = $row;
 		}
 		if ($i==3){
 			echo 'Reason/Problem: ';
@@ -59,9 +66,10 @@ function tabledata($row)
 			$problem = $row;
 		}
 		if ($i==4){
+			
 			echo 'Company: ';
 			echo $row.'<br>';
-			$company = $row;
+			$company = substr($row, 2);
 		}
 		if ($i==5){
 			//echo 'Details/photo/junk<br>';
@@ -79,10 +87,19 @@ function tabledata($row)
 }
 
 function sql($e,$r,$t,$y,$u,$i){
+
 	$db = new PDO('mysql:host=recalldb.db.8532513.hostedresource.com;dbname=recalldb;charset=UTF8', 'recalldb', 'g4%Gb7S%88@i2#');
-	$sql = "INSERT INTO sources (date,link,brand_name,descr,prob_desc,company) VALUES (:date,:link,:brand_name,:descr,:prob_desc,:company)";
+
+	$statement = $db->prepare("select link from sources where link = :link");
+	$statement->execute(array(':link' => $r));
+	$linkresult = $statement->fetch();
+	//print_r($linkresult);
+	if ($linkresult[0] != $r) {
+
+	$sql = "INSERT INTO sources (unixtime,link,brand_name,descr,prob_desc,company) VALUES (:unixtime,:link,:brand_name,:descr,:prob_desc,:company)";
+
 	$q = $db->prepare($sql);
-	$q->execute(array(':date'=>$e,
+	$q->execute(array(':unixtime'=>$e,
 	                  ':link'=>$r,
 	                  ':brand_name'=>$t,
 	                  ':descr'=>$y,
@@ -90,6 +107,7 @@ function sql($e,$r,$t,$y,$u,$i){
 	                  ':company'=>$i,
 	                  ));
 	$db = null;
+	}
 }
 
 ?>
