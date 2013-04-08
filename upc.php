@@ -1,8 +1,8 @@
 <?php
-	
+include('simple_html_dom.php');
 $db = new PDO('mysql:host=recalldb.db.8532513.hostedresource.com;dbname=recalldb;charset=UTF8', 'recalldb', 'g4%Gb7S%88@i2#');
 
-$statement = $db->prepare("SELECT link, id FROM sources WHERE flag = 0 ORDER BY id DESC LIMIT 1");
+$statement = $db->prepare("SELECT link, id FROM sources WHERE flag = 0 ORDER BY id DESC LIMIT 3");
 $statement->execute();
 $linkresult = $statement->fetchAll();
 $db = null;
@@ -12,45 +12,60 @@ $db = null;
 
 foreach ($linkresult as $data) 
 {
-	articlelook($data['link']);
-		// echo 'http://www.fda.gov/Safety/Recalls/'.$data['link'].'<br>';
-		// echo $data['id'].'<br>';
-		// $page = file_get_contents('http://www.fda.gov/Safety/Recalls/'.$data['link'].'');
-		// echo $page;
+	articlelook($data['link'],$data['id']);
 
-		//preg_match("~[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}[^0-9]{1}[0-9]{1}~", subject)
-
-
-
+	$db = new PDO('mysql:host=recalldb.db.8532513.hostedresource.com;dbname=recalldb;charset=UTF8', 'recalldb', 'g4%Gb7S%88@i2#');
+	$sql = "UPDATE sources SET flag=1 WHERE id=?";
+	$q = $db->prepare($sql);
+	$q->execute(array($data['id']));
+	$db = null;
 }
 
 
-function articlelook($link)
+function articlelook($link,$id)
 {
 	echo $link;
-	$page = file_get_contents('http://www.fda.gov/Safety/Recalls/'.$link);
+	//$page = file_get_contents('http://www.fda.gov/Safety/Recalls/'.$link);
+
+
+	$html = new simple_html_dom();
+
+	$html = file_get_html('http://www.fda.gov/Safety/Recalls/'.$link);
+	$ret = $html->find('.middle-column', 0)->plaintext;
+	//preg_match('~class="middle-column"(.*?)MIDDLE-COLUMN~', $page, $partpage);
+	//print_r($ret);
 	
 	$jsonstring = file_get_contents("patterns.json");
 	$json_a = json_decode($jsonstring, true);
 
-	foreach ($json_a as $value) {
+	foreach ($json_a as $regex) {
 		//regexloop($value,$page);
 		//echo $value;
-		preg_match_all($value, $page, $out, PREG_SET_ORDER);
-		print_r($out);
+		preg_match_all($regex, $ret, $out, PREG_SET_ORDER);
+		//print_r($out);
+		foreach ($out as $key => $value) {
+			echo $value[0].',';
+			$numericupc = preg_replace("/[^0-9,.]/", "", $value[0]);
+			matchstoreage($numericupc,$id);
+
+		}
 	}
 
 
 }
-	
-function regexloop($value,$page)
-{
-	
-	//echo $page;
-	//echo $value;
-	preg_match_all($value, $page, $out, PREG_SET_ORDER);
-	print_r($out);
-}
 
+function matchstoreage($upc,$id)
+{
+	$db = new PDO('mysql:host=recalldb.db.8532513.hostedresource.com;dbname=recalldb;charset=UTF8', 'recalldb', 'g4%Gb7S%88@i2#');
+	$sql = "INSERT INTO upc (source_id,upc) VALUES (:id,:upc)";
+
+	$mttm = $db->prepare($sql);
+	$mttm->execute(array(':id'=>$id,
+	                  ':upc'=>$upc,
+	                  ));
+
+	$db = null;
+
+}
 
 ?>
