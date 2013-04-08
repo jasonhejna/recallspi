@@ -1,8 +1,10 @@
 <?php
+set_time_limit(36000);
+
 include('simple_html_dom.php');
 $db = new PDO('mysql:host=recalldb.db.8532513.hostedresource.com;dbname=recalldb;charset=UTF8', 'recalldb', 'g4%Gb7S%88@i2#');
 
-$statement = $db->prepare("SELECT link, id FROM sources WHERE flag = 0 ORDER BY id DESC LIMIT 3");
+$statement = $db->prepare("SELECT link, id FROM sources WHERE flag = 0 ORDER BY id DESC LIMIT 2");
 $statement->execute();
 $linkresult = $statement->fetchAll();
 $db = null;
@@ -45,7 +47,7 @@ function articlelook($link,$id)
 		//print_r($out);
 		foreach ($out as $key => $value) {
 			echo $value[0].',';
-			$numericupc = preg_replace("/[^0-9,.]/", "", $value[0]);
+			$numericupc = preg_replace("/[^0-9]/", "", $value[0]);
 			matchstoreage($numericupc,$id);
 
 		}

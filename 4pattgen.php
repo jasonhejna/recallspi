@@ -29,7 +29,7 @@ var_dump($combinatorics->permutations(array(
     '4'  => '4',
     '5'  => '5',
     '6'  => '6',
-    ), 4));
+    ), 5));
 
 $result = ob_get_clean();
 
@@ -42,7 +42,7 @@ $pattern = '~"(.*?)"~';
   
   foreach ($match as $key => $value) {
   	$i=0;
-  	$c=1079;
+  	$c=1439;
   	foreach ($value as $key => $value) {
 		
 		
@@ -52,7 +52,7 @@ $pattern = '~"(.*?)"~';
   			echo '"~';
   		}
   		$i++;
-  		if($i<=3)
+  		if($i<=4)
   		{
   			echo '[0-9]{'.$value.'}[^0-9]{1}';
   		}
@@ -61,7 +61,7 @@ $pattern = '~"(.*?)"~';
   			echo '[0-9]{'.$value.'}';
   		}
   		
-  		if($i>=4)
+  		if($i>=5)
   		{
   			$i=0;
   			
