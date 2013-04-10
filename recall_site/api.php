@@ -3,10 +3,6 @@
 $apikey = htmlspecialchars($_GET['apikey']);
 
 
-
-//$str = "1";
-//echo md5($str);
-
 if (isset($apikey))
 {
 	
@@ -21,6 +17,7 @@ if (isset($apikey))
 	
 	if($apikey == $keymatch['md5'])
 	{
+		//Add count checker
 		thiscall($keymatch['md5']);
 	}
 	if($apikey != $keymatch['md5'])
@@ -35,36 +32,232 @@ if (empty($apikey))
 
 function thiscall($apikey)
 {
-	echo 'welcome to the martix ';
-	echo $apikey;
-	echo '.....';
 
 	$thiscall = htmlspecialchars($_GET['thiscall']);
 	if($thiscall == 'brandname')
 	{
-		echo 'yay!';
+		brand_name();
 	}
-	elseif ($thiscall == 'boomname') {
-		echo 'boom';
+	elseif ($thiscall == 'brandcompany') {
+		brand_company_name();
+	}
+	elseif ($thiscall == 'company') {
+		company();
+	}
+	elseif ($thiscall == 'desc') {
+		desc();
+	}
+	elseif ($thiscall == 'problem') {
+		prob_desc();
+	}
+	elseif ($thiscall == 'desc/problem') {
+		desc_probdesc();
+	}
+	elseif ($thiscall == 'upc') {
+		upc();
 	}
 	else
 	{
-		echo 'no recognized call (thiscall).';
+		echo 'thiscall not a recognized.';
 	}
 }
 
-//brandname('kellogg');
-function brandname($search)
-{
-	$input1 = htmlspecialchars($_GET['input1']);
 
-	$db = new PDO('mysql:host=recalldb.db.8532513.hostedresource.com;dbname=recalldb;charset=UTF8', 'recallapi', 'f6%!T7y#85!e62');
-	$statement = $db->prepare("SELECT * FROM sources WHERE brand_name LIKE :search");
-	$statement->execute(array(':search' => $input1));
-	$result = $statement->fetchAll();
-	$db = null;
-	print_r($result);
+function output($result)
+{
+	if(isset($_GET['output']))
+	{
+		$output = htmlspecialchars($_GET['output']);
+
+		//json, xml, php
+		if($output == 'json')
+		{
+			echo json_encode($result);
+		}
+		elseif($output == 'xml')
+		{
+			$xml = xmlrpc_encode_request(NULL, $result); 
+			print_r($xml);
+		}
+		elseif($output == 'php')
+		{
+			print_r($result);
+		}
+		else
+		{
+			echo json_encode($result);
+		}
+	}
+	else
+	{
+		echo json_encode($result);
+	}
 }
 
+//START OF API FUNCTIONS
+
+function brand_name()
+{
+	$input = '%'.htmlspecialchars($_GET['input']).'%';
+
+	if(isset($_GET['date']))
+	{
+		$date = htmlspecialchars($_GET['date']);
+	}
+	else
+	{
+		$date = 0;
+	}
+
+	$input = '%'.htmlspecialchars($_GET['input']).'%';
+
+	$db = new PDO('mysql:host=recalldb.db.8532513.hostedresource.com;dbname=recalldb;charset=UTF8', 'recallapi', 'f6%!T7y#85!e62');
+	$statement = $db->prepare("SELECT * FROM sources WHERE (brand_name LIKE :search) AND unixtime>:datetime");
+	$statement->execute(array(':search' => $input,':datetime' => $date));
+	$result = $statement->fetchAll();
+	$db = null;
+
+	output($result);
+}
+
+function brand_company_name()
+{
+	$input = '%'.htmlspecialchars($_GET['input']).'%';
+
+	if(isset($_GET['date']))
+	{
+		$date = htmlspecialchars($_GET['date']);
+	}
+	else
+	{
+		$date = 0;
+	}
+
+	$input = '%'.htmlspecialchars($_GET['input']).'%';
+	//$input2 = '%'.htmlspecialchars($_GET['input2']).'%';
+
+	$db = new PDO('mysql:host=recalldb.db.8532513.hostedresource.com;dbname=recalldb;charset=UTF8', 'recallapi', 'f6%!T7y#85!e62');
+	$statement = $db->prepare("SELECT * FROM sources WHERE (brand_name LIKE :search OR company LIKE :searchtwo) AND unixtime>:datetime");
+	$statement->execute(array(':search' => $input,':searchtwo' => $input,':datetime' => $date));
+	$result = $statement->fetchAll();
+	$db = null;
+
+	output($result);
+}
+
+function company()
+{
+	$input = '%'.htmlspecialchars($_GET['input']).'%';
+
+	if(isset($_GET['date']))
+	{
+		$date = htmlspecialchars($_GET['date']);
+	}
+	else
+	{
+		$date = 0;
+	}
+
+	$input = '%'.htmlspecialchars($_GET['input']).'%';
+
+	$db = new PDO('mysql:host=recalldb.db.8532513.hostedresource.com;dbname=recalldb;charset=UTF8', 'recallapi', 'f6%!T7y#85!e62');
+	$statement = $db->prepare("SELECT * FROM sources WHERE (company LIKE :search) AND unixtime>:datetime");
+	$statement->execute(array(':search' => $input,':datetime' => $date));
+	$result = $statement->fetchAll();
+	$db = null;
+
+	output($result);
+}
+
+function desc()
+{
+
+	$input = '%'.htmlspecialchars($_GET['input']).'%';
+
+	if(isset($_GET['date']))
+	{
+		$date = htmlspecialchars($_GET['date']);
+	}
+	else
+	{
+		$date = 0;
+	}
+
+	$input = '%'.htmlspecialchars($_GET['input']).'%';
+
+	$db = new PDO('mysql:host=recalldb.db.8532513.hostedresource.com;dbname=recalldb;charset=UTF8', 'recallapi', 'f6%!T7y#85!e62');
+	$statement = $db->prepare("SELECT * FROM sources WHERE (descr LIKE :search) AND unixtime>:datetime");
+	$statement->execute(array(':search' => $input,':datetime' => $date));
+	$result = $statement->fetchAll();
+	$db = null;
+
+	output($result);
+}
+
+function prob_desc()
+{
+	$input = '%'.htmlspecialchars($_GET['input']).'%';
+
+	if(isset($_GET['date']))
+	{
+		$date = htmlspecialchars($_GET['date']);
+	}
+	else
+	{
+		$date = 0;
+	}
+
+	$db = new PDO('mysql:host=recalldb.db.8532513.hostedresource.com;dbname=recalldb;charset=UTF8', 'recallapi', 'f6%!T7y#85!e62');
+	$statement = $db->prepare("SELECT * FROM sources WHERE (prob_desc LIKE :search) AND unixtime>:datetime");
+	$statement->execute(array(':search' => $input,':datetime' => $date));
+	$result = $statement->fetchAll();
+	$db = null;
+
+	output($result);
+}
+
+function desc_probdesc()
+{
+	$input = '%'.htmlspecialchars($_GET['input']).'%';
+	//$input2 = '%'.htmlspecialchars($_GET['input2']).'%';
+	if(isset($_GET['date']))
+	{
+		$date = htmlspecialchars($_GET['date']);
+	}
+	else
+	{
+		$date = 0;
+	}
+
+
+	$db = new PDO('mysql:host=recalldb.db.8532513.hostedresource.com;dbname=recalldb;charset=UTF8', 'recallapi', 'f6%!T7y#85!e62');
+	$statement = $db->prepare("SELECT * FROM sources WHERE (descr LIKE :search OR prob_desc LIKE :searchtwo) AND unixtime>:datetime");
+	$statement->execute(array(':search' => $input,':searchtwo' => $input,':datetime' => $date));
+	$result = $statement->fetchAll();
+	$db = null;
+
+	output($result);
+}
+
+function upc()
+{
+	$input = htmlspecialchars($_GET['input']);
+	if(isset($_GET['date']))
+	{
+		$date = htmlspecialchars($_GET['date']);
+	}
+	else
+	{
+		$date = 0;
+	}
+
+	$db = new PDO('mysql:host=recalldb.db.8532513.hostedresource.com;dbname=recalldb;charset=UTF8', 'recallapi', 'f6%!T7y#85!e62');
+	$statement = $db->prepare("SELECT * FROM sources LEFT JOIN upc ON sources.id=upc.source_id WHERE upc.upccode = :search AND unixtime>:datetime");
+	$statement->execute(array(':search' => $input,':datetime' => $date));
+	$result = $statement->fetchAll();
+	$db = null;
+
+	output($result);
+}
 
 ?>
