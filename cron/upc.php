@@ -59,7 +59,7 @@ function articlelook($link,$id)
 function matchstoreage($upc,$id)
 {
 	$db = new PDO('mysql:host=recalldb.db.8532513.hostedresource.com;dbname=recalldb;charset=UTF8', 'recalldb', 'g4%Gb7S%88@i2#');
-	$sql = "INSERT INTO upc (source_id,upc) VALUES (:id,:upc)";
+	$sql = "INSERT INTO upc (source_id,upccode) VALUES (:id,:upc)";
 
 	$mttm = $db->prepare($sql);
 	$mttm->execute(array(':id'=>$id,
