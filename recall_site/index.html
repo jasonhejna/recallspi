@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<link href="jquery/css/ui-lightness/jquery-ui-1.10.2.custom.min.css" rel="stylesheet">
 	<script src="jquery/js/jquery-1.9.1.js"></script>
 	<script src="jquery/js/jquery-ui-1.10.2.custom.min.js"></script>
 	<link href='http://fonts.googleapis.com/css?family=Noto+Sans:400,700|Montserrat+Subrayada' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="style.css" />
+	<link rel="shortcut icon" href="images/favicon.ico">
+  	<link rel="icon" href="images/favicon.ico">
 	<title>Recall Spotter</title>
 	<script type="text/javascript">
 $(document).ready(function() {
@@ -68,6 +71,7 @@ function getter()
 
 	for (key in obj)
 	{
+		
 		document.getElementById('result').innerHTML += '<b>'+obj[i]['company']+'</b>';
 		document.getElementById('result').innerHTML += '<b>: '+obj[i]['brand_name']+'</b>';
 		document.getElementById('result').innerHTML += '<br>Product Description: '+obj[i]['descr'];
@@ -86,6 +90,7 @@ function getter()
 			}
 				
 		}
+		document.getElementById('result').innerHTML += '<br>fda.gov/Safety/Recalls/'+obj[i]['link'];
 		document.getElementById('result').innerHTML += '<br><hr>';
 
 		i++;

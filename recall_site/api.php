@@ -1,4 +1,5 @@
 <?php
+set_time_limit(3600);
 error_reporting(0);
 $apikey = htmlspecialchars($_GET['apikey']);
 
@@ -274,7 +275,7 @@ function upc()
 	}
 
 	$db = new PDO('mysql:host=recalldb.db.8532513.hostedresource.com;dbname=recalldb;charset=UTF8', 'recallapi', 'f6%!T7y#85!e62');
-	$statement = $db->prepare("SELECT * FROM sources LEFT JOIN upc ON sources.id=upc.source_id WHERE upc.upccode = :search AND unixtime>:datetime ORDER BY unixtime DESC");
+	$statement = $db->prepare("SELECT * FROM sources INNER JOIN upc ON sources.id=upc.source_id WHERE upc.upccode = :search AND unixtime>:datetime");
 	$statement->execute(array(':search' => $input,':datetime' => $date));
 	$result = $statement->fetchAll();
 	$db = null;
