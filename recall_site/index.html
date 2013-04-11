@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-	<script src="http://code.jquery.com/jquery-migrate-1.1.1.min.js"></script>
+	<link href="jquery/css/ui-lightness/jquery-ui-1.10.2.custom.min.css" rel="stylesheet">
+	<script src="jquery/js/jquery-1.9.1.js"></script>
+	<script src="jquery/js/jquery-ui-1.10.2.custom.min.js"></script>
 	<link href='http://fonts.googleapis.com/css?family=Noto+Sans:400,700|Montserrat+Subrayada' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="style.css" />
 	<title>Recall Spotter</title>
 	<script type="text/javascript">
 $(document).ready(function() {
-//$('#datepicker').hide();
 
 $('#searchbox').keyup(function(e){
 if(e.keyCode == 13)
@@ -17,31 +17,55 @@ if(e.keyCode == 13)
 }
 });
 
- $("input[type=submit]").attr("disabled", "disabled");
+
  
 $("#searchbox").keypress(function() {
-$("input[type=submit]").removeAttr("disabled");
+	$("input[type=submit]").removeAttr("disabled");
 });
 	$("#searchbutton").click(function() {
-		$("input[type=submit]").attr("disabled", "disabled");
+		document.getElementById('result').innerHTML = '';
+		document.getElementById('result').innerHTML = 'Loading...';
 		getter();
 
 	});
 
 function getter()
 {
-	document.getElementById('result').innerHTML = ''; //clear previous searches
+	
+
+	var unixtime = document.getElementById('unixtimehidden').innerHTML;
+	console.log(unixtime);
+	
 	var sresult = $("#searchbox").val();
-	$.get("api.php", { apikey: "recallspotter", thiscall: "brandcompany", input: sresult })
+
+	if ($('#upcid').is(':checked')) {
+		var callvalue = "upc";
+	}
+	else if($('#brcoid').is(':checked')) {
+		var callvalue = "brandcompany";
+	}
+	else if($('#descid').is(':checked')) {
+		var callvalue = "desc";
+	}
+	else if($('#problemid').is(':checked')) {
+		var callvalue = "problem";
+	}
+	else{
+		var callvalue = "brandcompany";
+	}
+	$.get("api.php", { apikey: "recallspotter", thiscall: callvalue, input: sresult, date: unixtime })
 	.done(function(data) {
 	console.log(data);
 	if(typeof(data) != "undefined" && data !== null)
 	{
 	    
 	
-	var obj = JSON.parse(data);
+	var obj = jQuery.parseJSON(data);
 	i=0;
-	document.getElementById('result').innerHTML += '<br><br>';
+	document.getElementById('result').innerHTML = ''; //clear pending
+	//document.getElementById('result').innerHTML = '<br><br><br>';
+
+
 	for (key in obj)
 	{
 		document.getElementById('result').innerHTML += '<b>'+obj[i]['company']+'</b>';
@@ -69,10 +93,10 @@ function getter()
 	}
 	if(data == 'null')
 	{
-		document.getElementById('result').innerHTML = '<br>No Results Found';
+		document.getElementById('result').innerHTML = 'No Results Found';
 	}
 	});
-$("input[type=submit]").removeAttr("disabled");
+
 }
 
 checkboxsettings();
@@ -95,43 +119,79 @@ function timeConverter(UNIX_timestamp){
 
  function checkboxsettings()
  {
+ 	var unixtime = 0;
  	$(function() {
-    		$( "#datepicker" ).datepicker();
-  		});
-	$('#date').click(function(e){
-	   
-	 })
+    	$( "#datepicker" ).datepicker({
+    		onSelect: function(dateText, inst) {
+    			var unixtime = Date.parse(dateText)/1000;
+    			document.getElementById('unixtimehidden').innerHTML = unixtime;
+    			document.getElementById('searchbox').value = 'After: '+dateText;
+    		},
+    		changeMonth: true,
+    		changeYear: true,
+    		defaultDate: "-5y"
+    	});
+  	});
+  	$('#datecheckbox').click(function(e){
+  		if ($('#datecheckbox').is(':checked')) {
+	    	$('#datepicker').focus();
+		}
+  	})
 
+	//upc
+	$('#upcid').click(function(e){
+		$('#brcoid').prop('checked', false);
+		$('#descid').prop('checked', false);
+		$('#problemid').prop('checked', false);
+	})
+	$('#brcoid').click(function(e){
+		$('#upcid').prop('checked', false);
+		$('#descid').prop('checked', false);
+		$('#problemid').prop('checked', false);
+	})
+	$('#descid').click(function(e){
+		$('#brcoid').prop('checked', false);
+		$('#upcid').prop('checked', false);
+		$('#problemid').prop('checked', false);
+	})
+	$('#problemid').click(function(e){
+		$('#brcoid').prop('checked', false);
+		$('#descid').prop('checked', false);
+		$('#upcid').prop('checked', false);
+	})
  }
 	</script>
 </head>
 <body>
 <div class="main">
 <div class="logodiv"><img src="images/logo.png" class="logoimage"></div>
-
+<span id="datestring"></span>
 	<input type="text" name="s" value="Search product Recalls...." id="searchbox" class="textinput" onfocus="(this.value = '')"></input>
-
+	
 	<input type="submit" id="searchbutton" class="buttoninput" value="search"></input>
 	<br>
-	<span id="date" class="checkbox">
-	<input type="checkbox" name="date" value="date"  />Date
+	<span id="datespan" class="checkbox">
+		<input type="text" id="datepicker" /><span id="unixtimehidden"></span>
+	<input type="checkbox" name="date" value="date" id="datecheckbox" />Date
 
 	</span>
 	<span id="upc" class="checkbox">
-	<input type="checkbox" name="upc" value="upc"  />UPC
+	<input type="checkbox" name="upc" value="upc"  id="upcid" />UPC
 	</span>
 	<span id="brco" class="checkbox">
-	<input type="checkbox" name="upc" value="upc"  />Brand | Company
+	<input type="checkbox" name="upc" value="brco"  id="brcoid" checked="checked" />Brand | Company
 	</span>
 	<span id="desc" class="checkbox">
-	<input type="checkbox" name="upc" value="upc"  />Product Description
+	<input type="checkbox" name="upc" value="desc"  id="descid" />Product Description
 	</span>
 	<span id="problem" class="checkbox">
-	<input type="checkbox" name="upc" value="upc"  />Problem
+	<input type="checkbox" name="upc" value="problem"  id="problemid" />Problem
 	</span>
+	<br><br><br><br><br><br><br>
+
 	<div id="result" class="search-results"></div>
 
-	<input type="text" id="datepicker" />
+	
 
 </body>
 </html>
