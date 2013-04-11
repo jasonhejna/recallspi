@@ -1,5 +1,5 @@
 <?php
-
+error_reporting(0);
 $apikey = htmlspecialchars($_GET['apikey']);
 
 
@@ -58,7 +58,7 @@ function thiscall($apikey)
 	}
 	else
 	{
-		echo 'thiscall not a recognized.';
+		echo 'not a recognized call. ';
 	}
 }
 
@@ -90,8 +90,30 @@ function output($result)
 	}
 	else
 	{
+
 		echo json_encode($result);
+
 	}
+}
+
+function whereupcgetter($result)
+{
+	//print_r($result);
+	$i=0;
+	foreach ($result as $key => $value) {
+	//print_r($value);
+
+	$db = new PDO('mysql:host=recalldb.db.8532513.hostedresource.com;dbname=recalldb;charset=UTF8', 'recallapi', 'f6%!T7y#85!e62');
+	$statement = $db->prepare("SELECT upccode FROM upc WHERE source_id=:id");
+	$statement->execute(array(':id' => $value['id']));
+	$sqlresult = $statement->fetchAll();
+	$db = null;
+
+	$merged = array_merge($value, $sqlresult);
+	$array[$i] = $merged;
+	$i++;	
+	}
+	output($array);
 }
 
 //START OF API FUNCTIONS
@@ -112,12 +134,12 @@ function brand_name()
 	$input = '%'.htmlspecialchars($_GET['input']).'%';
 
 	$db = new PDO('mysql:host=recalldb.db.8532513.hostedresource.com;dbname=recalldb;charset=UTF8', 'recallapi', 'f6%!T7y#85!e62');
-	$statement = $db->prepare("SELECT * FROM sources WHERE (brand_name LIKE :search) AND unixtime>:datetime");
+	$statement = $db->prepare("SELECT * FROM sources WHERE (brand_name LIKE :search) AND unixtime>:datetime ORDER BY unixtime DESC");
 	$statement->execute(array(':search' => $input,':datetime' => $date));
 	$result = $statement->fetchAll();
 	$db = null;
 
-	output($result);
+	whereupcgetter($result);
 }
 
 function brand_company_name()
@@ -137,12 +159,12 @@ function brand_company_name()
 	//$input2 = '%'.htmlspecialchars($_GET['input2']).'%';
 
 	$db = new PDO('mysql:host=recalldb.db.8532513.hostedresource.com;dbname=recalldb;charset=UTF8', 'recallapi', 'f6%!T7y#85!e62');
-	$statement = $db->prepare("SELECT * FROM sources WHERE (brand_name LIKE :search OR company LIKE :searchtwo) AND unixtime>:datetime");
+	$statement = $db->prepare("SELECT * FROM sources WHERE (brand_name LIKE :search OR company LIKE :searchtwo) AND unixtime>:datetime ORDER BY unixtime DESC");
 	$statement->execute(array(':search' => $input,':searchtwo' => $input,':datetime' => $date));
 	$result = $statement->fetchAll();
 	$db = null;
 
-	output($result);
+	whereupcgetter($result);
 }
 
 function company()
@@ -161,12 +183,12 @@ function company()
 	$input = '%'.htmlspecialchars($_GET['input']).'%';
 
 	$db = new PDO('mysql:host=recalldb.db.8532513.hostedresource.com;dbname=recalldb;charset=UTF8', 'recallapi', 'f6%!T7y#85!e62');
-	$statement = $db->prepare("SELECT * FROM sources WHERE (company LIKE :search) AND unixtime>:datetime");
+	$statement = $db->prepare("SELECT * FROM sources WHERE (company LIKE :search) AND unixtime>:datetime ORDER BY unixtime DESC");
 	$statement->execute(array(':search' => $input,':datetime' => $date));
 	$result = $statement->fetchAll();
 	$db = null;
 
-	output($result);
+	whereupcgetter($result);
 }
 
 function desc()
@@ -186,12 +208,12 @@ function desc()
 	$input = '%'.htmlspecialchars($_GET['input']).'%';
 
 	$db = new PDO('mysql:host=recalldb.db.8532513.hostedresource.com;dbname=recalldb;charset=UTF8', 'recallapi', 'f6%!T7y#85!e62');
-	$statement = $db->prepare("SELECT * FROM sources WHERE (descr LIKE :search) AND unixtime>:datetime");
+	$statement = $db->prepare("SELECT * FROM sources WHERE (descr LIKE :search) AND unixtime>:datetime ORDER BY unixtime DESC");
 	$statement->execute(array(':search' => $input,':datetime' => $date));
 	$result = $statement->fetchAll();
 	$db = null;
 
-	output($result);
+	whereupcgetter($result);
 }
 
 function prob_desc()
@@ -208,12 +230,12 @@ function prob_desc()
 	}
 
 	$db = new PDO('mysql:host=recalldb.db.8532513.hostedresource.com;dbname=recalldb;charset=UTF8', 'recallapi', 'f6%!T7y#85!e62');
-	$statement = $db->prepare("SELECT * FROM sources WHERE (prob_desc LIKE :search) AND unixtime>:datetime");
+	$statement = $db->prepare("SELECT * FROM sources WHERE (prob_desc LIKE :search) AND unixtime>:datetime ORDER BY unixtime DESC");
 	$statement->execute(array(':search' => $input,':datetime' => $date));
 	$result = $statement->fetchAll();
 	$db = null;
 
-	output($result);
+	whereupcgetter($result);
 }
 
 function desc_probdesc()
@@ -231,12 +253,12 @@ function desc_probdesc()
 
 
 	$db = new PDO('mysql:host=recalldb.db.8532513.hostedresource.com;dbname=recalldb;charset=UTF8', 'recallapi', 'f6%!T7y#85!e62');
-	$statement = $db->prepare("SELECT * FROM sources WHERE (descr LIKE :search OR prob_desc LIKE :searchtwo) AND unixtime>:datetime");
+	$statement = $db->prepare("SELECT * FROM sources WHERE (descr LIKE :search OR prob_desc LIKE :searchtwo) AND unixtime>:datetime ORDER BY unixtime DESC");
 	$statement->execute(array(':search' => $input,':searchtwo' => $input,':datetime' => $date));
 	$result = $statement->fetchAll();
 	$db = null;
 
-	output($result);
+	whereupcgetter($result);
 }
 
 function upc()
@@ -252,12 +274,12 @@ function upc()
 	}
 
 	$db = new PDO('mysql:host=recalldb.db.8532513.hostedresource.com;dbname=recalldb;charset=UTF8', 'recallapi', 'f6%!T7y#85!e62');
-	$statement = $db->prepare("SELECT * FROM sources LEFT JOIN upc ON sources.id=upc.source_id WHERE upc.upccode = :search AND unixtime>:datetime");
+	$statement = $db->prepare("SELECT * FROM sources LEFT JOIN upc ON sources.id=upc.source_id WHERE upc.upccode = :search AND unixtime>:datetime ORDER BY unixtime DESC");
 	$statement->execute(array(':search' => $input,':datetime' => $date));
 	$result = $statement->fetchAll();
 	$db = null;
 
-	output($result);
+	whereupcgetter($result);
 }
 
 ?>
