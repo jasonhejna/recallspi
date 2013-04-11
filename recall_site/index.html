@@ -8,6 +8,8 @@
 	<title>Recall Spotter</title>
 	<script type="text/javascript">
 $(document).ready(function() {
+//$('#datepicker').hide();
+
 $('#searchbox').keyup(function(e){
 if(e.keyCode == 13)
 {
@@ -53,7 +55,7 @@ function getter()
 			//console.log(key);
 			if(key==8)
 			{
-				document.getElementById('result').innerHTML += '<br>Product Code(s): ';
+				document.getElementById('result').innerHTML += '<br>UPC(s): ';
 			}
 			if(key>=8){
 				document.getElementById('result').innerHTML += obj[i][key]['upccode']+', ';
@@ -72,7 +74,11 @@ function getter()
 	});
 $("input[type=submit]").removeAttr("disabled");
 }
-});
+
+checkboxsettings();
+
+}); // end document ready
+
 function timeConverter(UNIX_timestamp){
  var a = new Date(UNIX_timestamp*1000);
  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -86,6 +92,17 @@ function timeConverter(UNIX_timestamp){
      //return time;
      document.getElementById('result').innerHTML += '<br><b>'+time+'</b> ';
  }
+
+ function checkboxsettings()
+ {
+ 	$(function() {
+    		$( "#datepicker" ).datepicker();
+  		});
+	$('#date').click(function(e){
+	   
+	 })
+
+ }
 	</script>
 </head>
 <body>
@@ -96,7 +113,25 @@ function timeConverter(UNIX_timestamp){
 
 	<input type="submit" id="searchbutton" class="buttoninput" value="search"></input>
 	<br>
+	<span id="date" class="checkbox">
+	<input type="checkbox" name="date" value="date"  />Date
+
+	</span>
+	<span id="upc" class="checkbox">
+	<input type="checkbox" name="upc" value="upc"  />UPC
+	</span>
+	<span id="brco" class="checkbox">
+	<input type="checkbox" name="upc" value="upc"  />Brand | Company
+	</span>
+	<span id="desc" class="checkbox">
+	<input type="checkbox" name="upc" value="upc"  />Product Description
+	</span>
+	<span id="problem" class="checkbox">
+	<input type="checkbox" name="upc" value="upc"  />Problem
+	</span>
 	<div id="result" class="search-results"></div>
+
+	<input type="text" id="datepicker" />
 
 </body>
 </html>
