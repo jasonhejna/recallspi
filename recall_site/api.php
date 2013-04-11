@@ -160,8 +160,8 @@ function brand_company_name()
 	//$input2 = '%'.htmlspecialchars($_GET['input2']).'%';
 
 	$db = new PDO('mysql:host=recalldb.db.8532513.hostedresource.com;dbname=recalldb;charset=UTF8', 'recallapi', 'f6%!T7y#85!e62');
-	$statement = $db->prepare("SELECT * FROM sources WHERE (brand_name LIKE :search OR company LIKE :searchtwo) AND unixtime>:datetime ORDER BY unixtime DESC");
-	$statement->execute(array(':search' => $input,':searchtwo' => $input,':datetime' => $date));
+	$statement = $db->prepare("SELECT * FROM sources WHERE (brand_name LIKE :search OR company LIKE :searchtwo OR descr LIKE :searchthree) AND unixtime>:datetime ORDER BY unixtime DESC");
+	$statement->execute(array(':search' => $input,':searchtwo' => $input, ':searchthree' => $input, ':datetime' => $date));
 	$result = $statement->fetchAll();
 	$db = null;
 
