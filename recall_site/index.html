@@ -3,17 +3,95 @@
 <head>
 	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 	<script src="http://code.jquery.com/jquery-migrate-1.1.1.min.js"></script>
+	<link href='http://fonts.googleapis.com/css?family=Noto+Sans:400,700|Montserrat+Subrayada' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="style.css" />
-	<title>Recall Spi</title>
+	<title>Recall Spotter</title>
+	<script type="text/javascript">
+$(document).ready(function() {
+$('#searchbox').keyup(function(e){
+if(e.keyCode == 13)
+{
+  getter();
+}
+});
+
+ $("input[type=submit]").attr("disabled", "disabled");
+ 
+$("#searchbox").keypress(function() {
+$("input[type=submit]").removeAttr("disabled");
+});
+	$("#searchbutton").click(function() {
+		getter();
+
+	});
+
+function getter()
+{
+	document.getElementById('result').innerHTML = ''; //clear previous searches
+	var sresult = $("#searchbox").val();
+	$.get("api.php", { apikey: "recallspotter", thiscall: "company", input: sresult })
+	.done(function(data) {
+	console.log(data);
+	var obj = JSON.parse(data);
+	i=0;
+	document.getElementById('result').innerHTML += '<br><br>';
+	for (key in obj)
+	{
+
+		document.getElementById('result').innerHTML += obj[i]['company'];
+		document.getElementById('result').innerHTML += ': '+obj[i]['brand_name'];
+	
+			
+
+
+		document.getElementById('result').innerHTML += '<br>Product Description: '+obj[i]['descr'];
+		timeConverter(obj[i]['unixtime']);
+		//document.getElementById('result').innerHTML += '<br><b>'+obj[i]['unixtime']+':</b> ';
+		document.getElementById('result').innerHTML += obj[i]['prob_desc'];
+		for(key in obj[i])
+		{
+			//console.log(key);
+			if(key==8)
+			{
+				document.getElementById('result').innerHTML += '<br>Product Code(s): ';
+			}
+			if(key>=8){
+				document.getElementById('result').innerHTML += obj[i][key]['upccode']+', ';
+			}
+				
+		}
+		document.getElementById('result').innerHTML += '<br><hr>';
+
+		i++;
+	}
+
+	});
+}
+});
+function timeConverter(UNIX_timestamp){
+ var a = new Date(UNIX_timestamp*1000);
+ var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+     var year = a.getFullYear();
+     var month = months[a.getMonth()];
+     var date = a.getDate();
+     var hour = a.getHours();
+     var min = a.getMinutes();
+     var sec = a.getSeconds();
+     var time = date+', '+month+' '+year;
+     //return time;
+     document.getElementById('result').innerHTML += '<br><b>'+time+'</b> ';
+ }
+	</script>
 </head>
 <body>
 <div class="main">
 <div class="logodiv"><img src="images/logo.png" class="logoimage"></div>
-<div class="left">
-	<input type="text" value="Search product Recalls....ex) " class="textinput"></input>
-</div>
-<div class="right">
-	<input type="button" value="search" class="buttoninput"></input>
-</div>
+
+	<input type="text" name="s" value="Search product Recalls...." id="searchbox" class="textinput" onfocus="(this.value = '')"></input>
+
+	<input type="submit" id="searchbutton" class="buttoninput" value="search"></input>
+	<br>
+	<div id="result" class="search-results"></div>
+
 </body>
 </html>
