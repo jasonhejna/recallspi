@@ -21,6 +21,7 @@ $("#searchbox").keypress(function() {
 $("input[type=submit]").removeAttr("disabled");
 });
 	$("#searchbutton").click(function() {
+		$("input[type=submit]").attr("disabled", "disabled");
 		getter();
 
 	});
@@ -29,21 +30,20 @@ function getter()
 {
 	document.getElementById('result').innerHTML = ''; //clear previous searches
 	var sresult = $("#searchbox").val();
-	$.get("api.php", { apikey: "recallspotter", thiscall: "company", input: sresult })
+	$.get("api.php", { apikey: "recallspotter", thiscall: "brandcompany", input: sresult })
 	.done(function(data) {
 	console.log(data);
+	if(typeof(data) != "undefined" && data !== null)
+	{
+	    
+	
 	var obj = JSON.parse(data);
 	i=0;
 	document.getElementById('result').innerHTML += '<br><br>';
 	for (key in obj)
 	{
-
-		document.getElementById('result').innerHTML += obj[i]['company'];
-		document.getElementById('result').innerHTML += ': '+obj[i]['brand_name'];
-	
-			
-
-
+		document.getElementById('result').innerHTML += '<b>'+obj[i]['company']+'</b>';
+		document.getElementById('result').innerHTML += '<b>: '+obj[i]['brand_name']+'</b>';
 		document.getElementById('result').innerHTML += '<br>Product Description: '+obj[i]['descr'];
 		timeConverter(obj[i]['unixtime']);
 		//document.getElementById('result').innerHTML += '<br><b>'+obj[i]['unixtime']+':</b> ';
@@ -64,8 +64,13 @@ function getter()
 
 		i++;
 	}
-
+	}
+	if(data == 'null')
+	{
+		document.getElementById('result').innerHTML = '<br>No Results Found';
+	}
 	});
+$("input[type=submit]").removeAttr("disabled");
 }
 });
 function timeConverter(UNIX_timestamp){
